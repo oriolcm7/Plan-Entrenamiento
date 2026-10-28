@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#192844">
+  <title>Mi entrenamiento · Plan semanal</title>
+  <style>
+    :root {
+      --navy: #192844;
+      --navy-2: #263957;
+      --cream: #f7f5f0;
+      --paper: #fffefa;
+      --peach: #f8e1d4;
+      --blue: #e1ebf4;
+      --ink: #253044;
+      --muted: #727b89;
+      --line: #d9d8d2;
+      --green: #387663;
+      --shadow: 0 12px 35px rgba(25, 40, 68, .08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--cream);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .shell { width: min(1100px, calc(100% - 32px)); margin: 0 auto; padding: 38px 0 30px; }
+    header { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 25px; }
+    .eyebrow { text-transform: uppercase; letter-spacing: .15em; color: var(--muted); font-size: .72rem; font-weight: 750; margin: 0 0 8px; }
+    h1 { color: var(--navy); font-family: Georgia, "Times New Roman", serif; font-size: clamp(2rem, 5vw, 3.3rem); line-height: 1.02; margin: 0; letter-spacing: -.035em; }
+    .subtitle { color: var(--muted); margin: 10px 0 0; font-size: .96rem; }
+    .reset { border: 1px solid var(--line); background: transparent; color: var(--muted); border-radius: 999px; padding: 10px 14px; font: inherit; font-size: .82rem; cursor: pointer; white-space: nowrap; }
+    .reset:hover { color: var(--navy); border-color: var(--navy); }
+    .overview { display: grid; grid-template-columns: 1.25fr 1fr 1fr; gap: 12px; margin-bottom: 23px; }
+    .stat { background: var(--paper); border: 1px solid rgba(25,40,68,.07); border-radius: 16px; padding: 17px 18px; box-shadow: var(--shadow); }
+    .stat-label { font-size: .77rem; color: var(--muted); margin-bottom: 8px; }
+    .stat-value { color: var(--navy); font-weight: 760; font-size: 1.45rem; letter-spacing: -.03em; }
+    .progress-track { height: 6px; background: #e9e7e1; border-radius: 99px; overflow: hidden; margin-top: 12px; }
+    .progress-fill { height: 100%; width: 0; background: var(--green); border-radius: inherit; transition: width .25s ease; }
+    .tabs { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 12px; margin-bottom: 3px; scrollbar-width: thin; }
+    .tab { border: 1px solid var(--line); background: rgba(255,255,255,.55); color: var(--muted); border-radius: 12px; padding: 12px 16px; cursor: pointer; min-width: 125px; text-align: left; font: inherit; transition: .18s ease; }
+    .tab strong { display: block; color: inherit; font-size: .93rem; }
+    .tab span { display: block; margin-top: 3px; font-size: .74rem; }
+    .tab.active { background: var(--navy); border-color: var(--navy); color: white; box-shadow: 0 6px 16px rgba(25,40,68,.16); }
+    .tab.active span { color: #d5deea; }
+    .week-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin: 19px 2px 14px; }
+    h2 { color: var(--navy); font-family: Georgia, "Times New Roman", serif; font-size: 1.75rem; margin: 0; letter-spacing: -.025em; }
+    .week-note { color: var(--muted); font-size: .82rem; margin: 6px 0 0; }
+    .week-count { font-size: .82rem; font-weight: 700; color: var(--navy); background: #e9e8e1; border-radius: 999px; padding: 8px 11px; white-space: nowrap; }
+    .sessions { display: grid; gap: 9px; }
+    .session { display: grid; grid-template-columns: 78px 1fr auto; gap: 16px; align-items: center; padding: 17px 18px; border-radius: 15px; border: 1px solid rgba(25,40,68,.06); background: var(--paper); box-shadow: 0 4px 15px rgba(25,40,68,.035); transition: opacity .2s, background .2s; }
+    .session.running { background: #fff6f0; }
+    .session.sport { background: #f0f5fa; }
+    .session.rest { background: #f1f0eb; }
+    .session.done { opacity: .65; }
+    .session.done .workout-title { text-decoration: line-through; text-decoration-thickness: 1.5px; }
+    .day { color: var(--muted); text-transform: uppercase; letter-spacing: .08em; font-size: .72rem; font-weight: 800; }
+    .workout-title { color: var(--navy); font-weight: 750; font-size: 1rem; margin: 0 0 4px; }
+    .workout-detail { color: #596273; font-size: .87rem; line-height: 1.5; margin: 0; }
+    .tag { display: inline-flex; align-items: center; gap: 6px; font-size: .72rem; color: var(--muted); margin-top: 7px; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+    .running .dot { background: #d78360; } .sport .dot { background: #6f96bb; } .rest .dot { background: #a3a39b; }
+    .check { width: 27px; height: 27px; accent-color: var(--green); cursor: pointer; justify-self: end; }
+    .footer { display: flex; flex-wrap: wrap; gap: 14px 22px; margin: 20px 3px 0; color: var(--muted); font-size: .78rem; }
+    .legend { display: inline-flex; align-items: center; gap: 7px; }
+    .legend .dot { width: 9px; height: 9px; }
+    .footnote { margin-top: 25px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: .76rem; line-height: 1.6; }
+    .empty { color: var(--muted); text-align: center; padding: 28px; }
+    @media (max-width: 650px) {
+      .shell { width: min(100% - 22px, 1100px); padding-top: 25px; }
+      header { align-items: flex-start; }
+      .reset { padding: 8px 10px; font-size: .75rem; }
+      .overview { grid-template-columns: 1fr 1fr; }
+      .stat:first-child { grid-column: 1 / -1; }
+      .tab { min-width: 112px; padding: 10px 12px; }
+      .session { grid-template-columns: 53px 1fr 25px; gap: 10px; padding: 14px 12px; }
+      .day { font-size: .65rem; }
+      .workout-title { font-size: .94rem; }
+      .workout-detail { font-size: .82rem; }
+      .week-head { align-items: center; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <p class="eyebrow">Plan de entrenamiento · 5 semanas</p>
+        <h1>Calendario semanal</h1>
+        <p class="subtitle">Un día cada vez. Marca tus sesiones y sigue tu progreso.</p>
+      </div>
+      <button class="reset" id="resetButton" type="button">Reiniciar progreso</button>
+    </header>
+
+    <section class="overview" aria-label="Resumen del progreso">
+      <div class="stat">
+        <div class="stat-label">Progreso total</div>
+        <div class="stat-value" id="totalProgress">0 de 35 sesiones</div>
+        <div class="progress-track"><div class="progress-fill" id="totalBar"></div></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Semana seleccionada</div>
+        <div class="stat-value" id="weekProgress">0 de 7</div>
+        <div class="progress-track"><div class="progress-fill" id="weekBar"></div></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Carrera objetivo</div>
+        <div class="stat-value">10 km <span aria-hidden="true">🏁</span></div>
+        <div class="stat-label" style="margin:7px 0 0">Domingo · Semana 5</div>
+      </div>
+    </section>
+
+    <nav class="tabs" id="tabs" aria-label="Seleccionar semana"></nav>
+    <section aria-live="polite">
+      <div class="week-head">
+        <div>
+          <h2 id="weekTitle">Semana 1</h2>
+          <p class="week-note" id="weekSubtitle"></p>
+        </div>
+        <div class="week-count" id="weekBadge">0 / 7 completados</div>
+      </div>
+      <div class="sessions" id="sessions"></div>
+    </section>
+
+    <div class="footer">
+      <span class="legend"><i class="dot" style="background:#d78360"></i> Running</span>
+      <span class="legend"><i class="dot" style="background:#6f96bb"></i> Pádel / tenis</span>
+      <span class="legend"><i class="dot" style="background:#a3a39b"></i> Descanso</span>
+    </div>
+    <p class="footnote">Las marcas se guardan automáticamente en este navegador. Si abres la web en otro dispositivo o borras los datos del navegador, el progreso no se sincronizará. “10' suave antes y 5' suave después” se aplica a las sesiones de running, como indica el planning original.</p>
+  </main>
+
+  <script>
+    const weeks = [
+      { label: "S1", dates: "26 oct–1 nov", sessions: [
+        ["Lun", "Pádel/tenis", "", "sport"],
+        ["Mar 🏃", "(Empieza el jueves)", "", "running"],
+        ["Mié", "Pádel/tenis", "", "sport"],
+        ["Jue 🏃", "4× (6' trote + 1' andar)", "Running suave", "running"],
+        ["Vie", "Descanso", "", "rest"],
+        ["Sáb", "Pádel/tenis suave", "", "sport"],
+        ["Dom 🏃", "30' seguidos suave", "Running suave", "running"]
+      ]},
+      { label: "S2", dates: "2–8 nov", sessions: [
+        ["Lun", "Pádel/tenis", "", "sport"],
+        ["Mar 🏃", "30' suave + 4 aceleraciones", "Running suave", "running"],
+        ["Mié", "Pádel/tenis suave", "", "sport"],
+        ["Jue 🏃", "5×3' a 5:20 (rec. 90\")", "Running · ritmo indicado", "running"],
+        ["Vie", "Descanso", "", "rest"],
+        ["Sáb", "Pádel/tenis suave", "", "sport"],
+        ["Dom 🏃", "45' suave", "Running suave", "running"]
+      ]},
+      { label: "S3", dates: "9–15 nov", sessions: [
+        ["Lun", "Pádel/tenis", "", "sport"],
+        ["Mar 🏃", "35': 25' suave + 10' a 6:00", "Running · ritmo indicado", "running"],
+        ["Mié", "Pádel/tenis suave", "", "sport"],
+        ["Jue 🏃", "3×8' a 5:30 (rec. 2')", "Running · ritmo indicado", "running"],
+        ["Vie", "Descanso", "", "rest"],
+        ["Sáb", "Pádel/tenis suave", "", "sport"],
+        ["Dom 🏃", "55' suave", "Running suave", "running"]
+      ]},
+      { label: "S4", dates: "16–22 nov", sessions: [
+        ["Lun", "Pádel/tenis", "", "sport"],
+        ["Mar 🏃", "40' suave + 6 aceleraciones", "Running suave", "running"],
+        ["Mié", "Pádel/tenis suave", "", "sport"],
+        ["Jue 🏃", "2×12' a 5:30 (rec. 3') · CLAVE", "Running · sesión clave", "running"],
+        ["Vie", "Descanso", "", "rest"],
+        ["Sáb", "Pádel/tenis suave", "", "sport"],
+        ["Dom 🏃", "70' suave (unos 10 km)", "Running suave", "running"]
+      ]},
+      { label: "S5", dates: "23–29 nov", sessions: [
+        ["Lun", "Pádel/tenis", "", "sport"],
+        ["Mar 🏃", "3×5' a 5:30 (rec. 2')", "Running · ritmo indicado", "running"],
+        ["Mié", "Pádel/tenis suave", "", "sport"],
+        ["Jue 🏃", "20' suave + 4 aceleraciones", "Running suave", "running"],
+        ["Vie", "Descanso", "", "rest"],
+        ["Sáb", "Descanso total", "", "rest"],
+        ["Dom 🏁", "CARRERA 10K", "¡Día de carrera!", "race"]
+      ]}
+    ];
+    const STORAGE_KEY = "training-planner-v1";
+    let activeWeek = 0;
+    let completed = loadCompleted();
+
+    function loadCompleted() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
+      catch { return {}; }
+    }
+    function saveCompleted() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(completed)); } catch {}
+    }
+    function isDone(w, d) { return Boolean(completed[`${w}-${d}`]); }
+    function toggleDone(w, d, checked) {
+      const key = `${w}-${d}`;
+      if (checked) completed[key] = true; else delete completed[key];
+      saveCompleted();
+      render();
+    }
+    function weekDoneCount(w) {
+      return weeks[w].sessions.reduce((n, _, d) => n + (isDone(w, d) ? 1 : 0), 0);
+    }
+    function allDoneCount() {
+      return weeks.reduce((n, _, w) => n + weekDoneCount(w), 0);
+    }
+    function renderTabs() {
+      const tabs = document.getElementById("tabs");
+      tabs.innerHTML = "";
+      weeks.forEach((week, index) => {
+        const button = document.createElement("button");
+        button.className = `tab${index === activeWeek ? " active" : ""}`;
+        button.type = "button";
+        button.setAttribute("aria-pressed", String(index === activeWeek));
+        button.innerHTML = `<strong>${week.label}</strong><span>${week.dates}</span>`;
+        button.addEventListener("click", () => { activeWeek = index; render(); });
+        tabs.appendChild(button);
+      });
+    }
+    function renderSessions() {
+      const container = document.getElementById("sessions");
+      container.innerHTML = "";
+      weeks[activeWeek].sessions.forEach((session, dayIndex) => {
+        const [day, title, detail, type] = session;
+        const done = isDone(activeWeek, dayIndex);
+        const card = document.createElement("article");
+        card.className = `session ${type === "race" ? "running" : type}${done ? " done" : ""}`;
+        const dayEl = document.createElement("div");
+        dayEl.className = "day";
+        dayEl.textContent = day;
+        const info = document.createElement("div");
+        const titleEl = document.createElement("p");
+        titleEl.className = "workout-title";
+        titleEl.textContent = title;
+        info.appendChild(titleEl);
+        if (detail) {
+          const detailEl = document.createElement("p");
+          detailEl.className = "workout-detail";
+          detailEl.textContent = detail;
+          info.appendChild(detailEl);
+        }
+        const tag = document.createElement("span");
+        tag.className = "tag";
+        const dot = document.createElement("i");
+        dot.className = "dot";
+        tag.append(dot, document.createTextNode(type === "running" || type === "race" ? "Running" : type === "sport" ? "Pádel / tenis" : "Recuperación"));
+        info.appendChild(tag);
+        const label = document.createElement("label");
+        label.setAttribute("aria-label", `Marcar como completado: ${day}, ${title}`);
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.className = "check";
+        checkbox.checked = done;
+        checkbox.addEventListener("change", event => toggleDone(activeWeek, dayIndex, event.target.checked));
+        label.appendChild(checkbox);
+        card.append(dayEl, info, label);
+        container.appendChild(card);
+      });
+    }
+    function renderStats() {
+      const total = allDoneCount();
+      const weekly = weekDoneCount(activeWeek);
+      document.getElementById("totalProgress").textContent = `${total} de 35 sesiones`;
+      document.getElementById("totalBar").style.width = `${total / 35 * 100}%`;
+      document.getElementById("weekProgress").textContent = `${weekly} de 7`;
+      document.getElementById("weekBar").style.width = `${weekly / 7 * 100}%`;
+      document.getElementById("weekBadge").textContent = `${weekly} / 7 completados`;
+      document.getElementById("weekTitle").textContent = `Semana ${activeWeek + 1}`;
+      document.getElementById("weekSubtitle").textContent = `${weeks[activeWeek].dates} · ${7 - weekly} sesiones por completar`;
+    }
+    function render() { renderTabs(); renderSessions(); renderStats(); }
+    document.getElementById("resetButton").addEventListener("click", () => {
+      if (confirm("¿Quieres borrar todas las marcas de las cinco semanas?")) {
+        completed = {};
+        saveCompleted();
+        render();
+      }
+    });
+    render();
+  </script>
+</body>
+</html>
